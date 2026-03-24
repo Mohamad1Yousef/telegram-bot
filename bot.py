@@ -2,7 +2,7 @@ from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, ConversationHandler, MessageHandler, filters
 from datetime import datetime
 
-BOT_TOKEN = "8211007927:AAEk5mRF2RoX4zoX_kW9ns67x 2IJYAa8co0"
+BOT_TOKEN = "8211007927:AAHF_G-z95bcMpF5QSeklVsa2eJ3jKhvo80"
 ADMIN_CHAT_ID = 1498115119
 NETWORK_NAME = "VR Network"
 PAYMENT_INFO = "التحويل قبل الاستلام باسم: محمد يوسف ابو معمر\nIBAN: PS44PALS044817049130993000000\nيرجى إرسال إشعار التحويل داخل المحادثة بعد الدفع."
