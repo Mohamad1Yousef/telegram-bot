@@ -14,7 +14,7 @@ from telegram.ext import (
 # =========================
 # الإعدادات
 # =========================
-BOT_TOKEN ="8211007927:AAHF_G-z95bcMpF5QSeklVsa2eJ3jKhvo80"
+BOT_TOKEN = "8211007927:AAHF_G-z95bcMpF5QSeklVsa2eJ3jKhvo80"
 ADMIN_CHAT_ID = 1498115119
 NETWORK_NAME = "VR Network"
 
