@@ -14,15 +14,17 @@ from telegram.ext import (
 # =========================
 # الإعدادات
 # =========================
-BOT_TOKEN = "8211007927:AAHF_G-z95bcMpF5QSeklVsa2eJ3jKhvo80"
+BOT_TOKEN ="8211007927:AAHF_G-z95bcMpF5QSeklVsa2eJ3jKhvo80"
 ADMIN_CHAT_ID = 1498115119
 NETWORK_NAME = "VR Network"
-PAYMENT_INFO = PAYMENT_INFO = (
+
+PAYMENT_INFO = (
     "بنك فلسطين\n"
     "الاسم: محمد يوسف ابو معمر\n"
     "IBAN: PS44PALS044817049130993000000\n"
     "أرسل إشعار التحويل داخل المحادثة بعد الدفع."
 )
+
 # =========================
 # الحالات
 # =========================
@@ -67,6 +69,14 @@ card_type_keyboard = ReplyKeyboardMarkup(
     resize_keyboard=True
 )
 
+qty_keyboard = ReplyKeyboardMarkup(
+    [
+        ["100", "200"],
+        ["❌ إلغاء"],
+    ],
+    resize_keyboard=True
+)
+
 delivery_keyboard = ReplyKeyboardMarkup(
     [
         ["📄 ملف", "🖼 صورة"],
@@ -94,6 +104,15 @@ def get_card_summary(choice: str) -> str:
     if choice == "2 شيكل - 10 ساعات - 3 ميجا":
         return "2 شيكل | 10 ساعات | 3 ميجا"
     return choice
+
+
+def user_info_block(user) -> str:
+    username = f"@{user.username}" if user.username else "لا يوجد"
+    return (
+        f"الاسم الظاهر: {user.full_name}\n"
+        f"يوزر العميل: {username}\n"
+        f"User ID: {user.id}"
+    )
 
 
 async def send_to_admin_and_map(
@@ -130,15 +149,6 @@ async def send_to_admin_and_map(
 
     if sent_message:
         context.bot_data["reply_map"][sent_message.message_id] = user_id
-
-
-def user_info_block(user) -> str:
-    username = f"@{user.username}" if user.username else "لا يوجد"
-    return (
-        f"الاسم الظاهر: {user.full_name}\n"
-        f"يوزر العميل: {username}\n"
-        f"User ID: {user.id}"
-    )
 
 # =========================
 # أوامر أساسية
@@ -179,7 +189,6 @@ async def back_to_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # =========================
 async def main_menu_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.message or not update.message.text:
-        await update.message.reply_text("اختر خدمة من الأزرار الظاهرة.", reply_markup=main_keyboard)
         return MAIN_MENU
 
     text = update.message.text
@@ -187,7 +196,6 @@ async def main_menu_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if text == "🔧 تقديم شكوى أو عطل":
         await update.message.reply_text(
             "🔧 تقديم شكوى أو عطل\n\n"
-            "يمكنك تقديم الشكوى في أي وقت.\n"
             "الخطوة 1: اكتب الاسم الكامل:",
             reply_markup=cancel_keyboard
         )
@@ -246,7 +254,6 @@ async def main_menu_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # =========================
 async def fault_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
-
     if text == "❌ إلغاء":
         return await cancel(update, context)
 
@@ -257,7 +264,6 @@ async def fault_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def fault_area(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
-
     if text == "❌ إلغاء":
         return await cancel(update, context)
 
@@ -268,7 +274,6 @@ async def fault_area(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def fault_router(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
-
     if text == "❌ إلغاء":
         return await cancel(update, context)
 
@@ -279,7 +284,6 @@ async def fault_router(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def fault_details(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
-
     if text == "❌ إلغاء":
         return await cancel(update, context)
 
@@ -333,7 +337,6 @@ async def card_rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def card_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
-
     if text == "❌ إلغاء":
         return await cancel(update, context)
 
@@ -344,7 +347,6 @@ async def card_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def card_area(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
-
     if text == "❌ إلغاء":
         return await cancel(update, context)
 
@@ -358,7 +360,6 @@ async def card_area(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def card_type(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
-
     if text == "❌ إلغاء":
         return await cancel(update, context)
 
@@ -376,8 +377,8 @@ async def card_type(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     context.user_data["card_type"] = text
     await update.message.reply_text(
-        "الخطوة 5: أدخل الكمية المطلوبة (الحد الأدنى 100 بطاقة):",
-        reply_markup=ReplyKeyboardRemove()
+        "الخطوة 5: اختر الكمية المطلوبة:",
+        reply_markup=qty_keyboard
     )
     return CARD_QTY
 
@@ -388,16 +389,14 @@ async def card_qty(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if text == "❌ إلغاء":
         return await cancel(update, context)
 
-    if not text.isdigit():
-        await update.message.reply_text("يرجى إدخال رقم صحيح للكمية:")
+    if text not in ["100", "200"]:
+        await update.message.reply_text(
+            "يرجى اختيار الكمية من الأزرار فقط.",
+            reply_markup=qty_keyboard
+        )
         return CARD_QTY
 
-    qty = int(text)
-    if qty < 100:
-        await update.message.reply_text("❌ أقل حد للطلب هو 100 بطاقة. أدخل كمية صحيحة:")
-        return CARD_QTY
-
-    context.user_data["card_qty"] = qty
+    context.user_data["card_qty"] = int(text)
     await update.message.reply_text(
         "الخطوة 6: اختر طريقة التسليم:",
         reply_markup=delivery_keyboard
@@ -423,9 +422,7 @@ async def card_delivery(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "الخطوة 7: أرسل الآن إشعار التحويل داخل المحادثة.\n\n"
         f"{PAYMENT_INFO}\n\n"
-        "يمكنك إرسال:\n"
-        "• صورة\n"
-        "• أو ملف",
+        "يمكنك إرسال صورة أو ملف.",
         reply_markup=ReplyKeyboardRemove()
     )
     return CARD_RECEIPT
@@ -464,7 +461,7 @@ async def card_receipt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return CARD_RECEIPT
 
     await update.message.reply_text(
-        "✅ تم استلام إشعار التحويل والطلب بنجاح.\nسيتم مراجعة الطلب والتواصل معك.",
+        "✅ تم استلام طلبك وسيتم إرسال الملف قريبًا.",
         reply_markup=main_keyboard
     )
     context.user_data.clear()
@@ -475,6 +472,9 @@ async def card_receipt(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # =========================
 async def user_general_media_or_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id == ADMIN_CHAT_ID:
+        return
+
+    if context.user_data:
         return
 
     if update.message.reply_to_message:
@@ -493,6 +493,8 @@ async def user_general_media_or_text(update: Update, context: ContextTypes.DEFAU
             "❌ إلغاء",
             "📄 ملف",
             "🖼 صورة",
+            "100",
+            "200",
             "1 شيكل - 8 ساعات - 2 ميجا",
             "2 شيكل - 10 ساعات - 3 ميجا",
         }:
@@ -505,7 +507,7 @@ async def user_general_media_or_text(update: Update, context: ContextTypes.DEFAU
             "يمكنك الرد على هذه الرسالة مباشرة."
         )
         await send_to_admin_and_map(context, user_id=user.id, text=text)
-        await update.message.reply_text("تم إرسال رسالتك للإدارة ✅", reply_markup=main_keyboard)
+        await update.message.reply_text("✅ تم إرسال رسالتك للإدارة.", reply_markup=main_keyboard)
         return
 
     if update.message.photo:
@@ -520,7 +522,7 @@ async def user_general_media_or_text(update: Update, context: ContextTypes.DEFAU
             photo_file_id=update.message.photo[-1].file_id,
             caption=caption
         )
-        await update.message.reply_text("تم إرسال الصورة للإدارة ✅", reply_markup=main_keyboard)
+        await update.message.reply_text("✅ تم إرسال الصورة للإدارة.", reply_markup=main_keyboard)
         return
 
     if update.message.document:
@@ -536,7 +538,7 @@ async def user_general_media_or_text(update: Update, context: ContextTypes.DEFAU
             document_file_id=update.message.document.file_id,
             caption=caption
         )
-        await update.message.reply_text("تم إرسال الملف للإدارة ✅", reply_markup=main_keyboard)
+        await update.message.reply_text("✅ تم إرسال الملف للإدارة.", reply_markup=main_keyboard)
         return
 
 # =========================
@@ -656,6 +658,7 @@ def main():
 
     print("Bot is running...")
     app.run_polling()
+
 
 if __name__ == "__main__":
     main()
